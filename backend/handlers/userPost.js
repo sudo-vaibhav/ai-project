@@ -255,172 +255,190 @@ function getTeachersId(req, res, next) {
     })
 }
 
-function search(req, res, next) {
+async function search(req, res, next) {
 
     if (!req.body.course) return res.status(400).json({ "err": "course is required" })
     if (!req.body.vision) return res.status(400).json({ "err": "vision is required" })
 
-    Org.find({}, (err, org) => {
+    const subjectTeachers = (await Org.find({})).filter(org => org.course.toLowerCase().includes(req.body.course.toLowerCase())).map(x => x.toJSON())
+    console.log("sending suggestion request with vision", req.body.vision)
 
-        if (err) res.send(err)
+    let rankedTeachers = []
+    try {
 
-        if (org) {
+        const temp = await axios.post(userSearchUri, {
+            teachers: subjectTeachers,
+            student: req.body.vision
+        })
+        console.log("temp", temp.data)
+        rankedTeachers = temp.data.teachers
+        console.log("ranked teachers", rankedTeachers.data)
+    }
+    catch (err) {
+        console.log("could not get teacher score", err)
+    }
+    return res.send({ teachers: rankedTeachers })
+    // Org.find({}, (err, org) => {
 
-            var otherOrgModified = []
+    //     if (err) res.send(err)
 
+    //     if (org) {
 
-            var newOrg = org.filter(function (val) { return val.course === req.body.course })
-
-            var obOfVision = {
-                teachers: [],
-                student: ""
-            } //we have to send this in api request
-
-            newOrg.forEach(element => {
-
-                obOfVision.teachers.push({
-                    id: element._id,
-                    desc: element.vision
-                })
-            })
-
-            obOfVision.student = req.body.vision
-
-            var exampleIds = []
-            var exampleScores = []
+    //         var otherOrgModified = []
 
 
+    //         var newOrg = org.filter(function (val) { return val.course === req.body.course })
 
-            axios.post(userSearchUri, obOfVision)
-                .then(function (response) {
-                    // console.log(response.data)
+    //         var obOfVision = {
+    //             teachers: [],
+    //             student: ""
+    //         } //we have to send this in api request
 
-                    for (let i = 0; i < response.data.teachers.length; i++) {
-                        exampleIds.push(response.data.teachers[i].id)
-                        exampleScores.push(response.data.teachers[i].score)
-                    }
+    //         newOrg.forEach(element => {
 
-                    // console.log(exampleIds)
-                    // console.log(exampleScores)
-                })
-                .then(() => {
-                    var org1Name = ''
-                    var org2Name = ''
-                    var org3Name = ''
+    //             obOfVision.teachers.push({
+    //                 id: element._id,
+    //                 desc: element.vision
+    //             })
+    //         })
 
-                    var org1Score = ''
-                    var org2Score = ''
-                    var org3Score = ''
+    //         obOfVision.student = req.body.vision
 
-                    var org1TestCreated = []
-                    var org2TestCreated = []
-                    var org3TestCreated = []
+    //         var exampleIds = []
+    //         var exampleScores = []
 
 
-                    Org.findOne({ _id: exampleIds[0] }, (err, org1) => {
 
-                        if (err) res.send(err)
-                        else {
-                            org1Name = org1.teacherName
-                            org1Score = exampleScores[0]
-                            org1TestCreated = org1.testCreated
-                        }
+    //         axios.post(userSearchUri, obOfVision)
+    //             .then(function (response) {
+    //                 // console.log(response.data)
 
-                    })
-                        .then(() => {
-                            Org.findOne({ _id: exampleIds[1] }, (err, org2) => {
+    //                 for (let i = 0; i < response.data.teachers.length; i++) {
+    //                     exampleIds.push(response.data.teachers[i].id)
+    //                     exampleScores.push(response.data.teachers[i].score)
+    //                 }
 
-                                if (err) res.send(err)
-                                else {
-                                    org2Name = org2.teacherName
-                                    org2Score = exampleScores[1]
-                                    org2TestCreated = org2.testCreated
+    //                 // console.log(exampleIds)
+    //                 // console.log(exampleScores)
+    //             })
+    //             .then(() => {
+    //                 var org1Name = ''
+    //                 var org2Name = ''
+    //                 var org3Name = ''
 
-                                }
+    //                 var org1Score = ''
+    //                 var org2Score = ''
+    //                 var org3Score = ''
 
-                            })
-                                .then(() => {
-                                    Org.findOne({ _id: exampleIds[2] }, (err, org3) => {
-
-                                        if (err) res.send(err)
-                                        else {
-                                            org3Name = org3.teacherName
-                                            org3Score = exampleScores[2]
-                                            org3TestCreated = org3.testCreated
-
-                                        }
-
-                                    })
-                                        .then(() => {
+    //                 var org1TestCreated = []
+    //                 var org2TestCreated = []
+    //                 var org3TestCreated = []
 
 
-                                            newOrg.forEach(element => {
+    //                 Org.findOne({ _id: exampleIds[0] }, (err, org1) => {
 
-                                                f = 1
+    //                     if (err) res.send(err)
+    //                     else {
+    //                         org1Name = org1.teacherName
+    //                         org1Score = exampleScores[0]
+    //                         org1TestCreated = org1.testCreated
+    //                     }
+
+    //                 })
+    //                     .then(() => {
+    //                         Org.findOne({ _id: exampleIds[1] }, (err, org2) => {
+
+    //                             if (err) res.send(err)
+    //                             else {
+    //                                 org2Name = org2.teacherName
+    //                                 org2Score = exampleScores[1]
+    //                                 org2TestCreated = org2.testCreated
+
+    //                             }
+
+    //                         })
+    //                             .then(() => {
+    //                                 Org.findOne({ _id: exampleIds[2] }, (err, org3) => {
+
+    //                                     if (err) res.send(err)
+    //                                     else {
+    //                                         org3Name = org3.teacherName
+    //                                         org3Score = exampleScores[2]
+    //                                         org3TestCreated = org3.testCreated
+
+    //                                     }
+
+    //                                 })
+    //                                     .then(() => {
 
 
-                                                for (let i = 0; i < 3; i++) {
-                                                    if (element._id == exampleIds[i]) {
-                                                        f = 0
-                                                    }
-                                                }
+    //                                         newOrg.forEach(element => {
 
-                                                console.log(f)
-
-                                                if (f) {
-                                                    otherOrgModified.push({
-                                                        _id: element._id,
-                                                        name: element.teacherName,
-                                                        testCreated: element.testCreated
-                                                    })
-
-                                                }
+    //                                             f = 1
 
 
-                                            })
+    //                                             for (let i = 0; i < 3; i++) {
+    //                                                 if (element._id == exampleIds[i]) {
+    //                                                     f = 0
+    //                                                 }
+    //                                             }
 
-                                            res.send({
-                                                top3Result: [
-                                                    {
-                                                        _id: exampleIds[0],
-                                                        org1Name: org1Name,
-                                                        org1Score: org1Score,
-                                                        org1TestCreated: org1TestCreated
-                                                    },
-                                                    {
-                                                        _id: exampleIds[1],
-                                                        org2Name: org2Name,
-                                                        org2Score: org2Score,
-                                                        org2TestCreated: org2TestCreated
-                                                    },
-                                                    {
-                                                        _id: exampleIds[2],
-                                                        org3Name: org3Name,
-                                                        org3Score: org3Score,
-                                                        org3TestCreated: org3TestCreated
+    //                                             console.log(f)
 
-                                                    },
-                                                ],
-                                                OtherResults: otherOrgModified
+    //                                             if (f) {
+    //                                                 otherOrgModified.push({
+    //                                                     _id: element._id,
+    //                                                     name: element.teacherName,
+    //                                                     testCreated: element.testCreated
+    //                                                 })
 
-                                            })
+    //                                             }
 
-                                        })
 
-                                })
+    //                                         })
 
-                        })
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
+    //                                         res.send({
+    //                                             top3Result: [
+    //                                                 {
+    //                                                     _id: exampleIds[0],
+    //                                                     org1Name: org1Name,
+    //                                                     org1Score: org1Score,
+    //                                                     org1TestCreated: org1TestCreated
+    //                                                 },
+    //                                                 {
+    //                                                     _id: exampleIds[1],
+    //                                                     org2Name: org2Name,
+    //                                                     org2Score: org2Score,
+    //                                                     org2TestCreated: org2TestCreated
+    //                                                 },
+    //                                                 {
+    //                                                     _id: exampleIds[2],
+    //                                                     org3Name: org3Name,
+    //                                                     org3Score: org3Score,
+    //                                                     org3TestCreated: org3TestCreated
 
-        }
-        else {
-            return res.status(400).json({ "err": "select valid course for searching" })
-        }
+    //                                                 },
+    //                                             ],
+    //                                             OtherResults: otherOrgModified
 
-    })
+    //                                         })
+
+    //                                     })
+
+    //                             })
+
+    //                     })
+    //             })
+    //             .catch(function (error) {
+    //                 console.log(error);
+    //             });
+
+    //     }
+    //     else {
+    //         return res.status(400).json({ "err": "select valid course for searching" })
+    //     }
+
+    // })
 
 
 }

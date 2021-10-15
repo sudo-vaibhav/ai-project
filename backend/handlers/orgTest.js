@@ -7,12 +7,12 @@ const Org = require('../models/Orgs').Org;
 const formidable = require('formidable');
 const axios = require('axios');
 const { testUri } = require('../config')
-function addTest(req, res, next) {
+async function addTest(req, res, next) {
 
     axios.post(testUri, {
         "text": req.body.text
     })
-        .then(function (response) {
+        .then(async function (response) {
             // console.log(response)
             questions = (response.data.questions)
             console.log(questions)
@@ -21,13 +21,13 @@ function addTest(req, res, next) {
                 _id: new Mongoose.Types.ObjectId(),
                 testName: req.body.testName,
                 maxMarks: req.body.maxMarks,
-                perQuestionMarks: req.body.perQuestionMarks,
+                perQuestionMarks: 1,
                 negativeMarks: req.body.negativeMarks,
                 questions: questions,
 
             })
 
-            var OrgTest = new OrgTests({
+            var orgTest = new OrgTests({
                 testId: test._id,
                 teacherId: req.body.teacherId,
                 userScores: []
@@ -43,25 +43,30 @@ function addTest(req, res, next) {
 
             })
 
-            Test.findOne({ testName: test.testName }, (err, result) => {
-                if (err) next(err)
-                else {
-                    if (!result) {
+            const result = await Test.findOne({ testName: test.testName })
+            // , (err, result) => {
+            // if (err) next(err)
+            // else {
+            if (!result) {
+                console.log("test created: ", test)
 
-                        Promise.all([OrgTest.save(), test.save()])
-                            .then((result) => { res.send(test) })
-                            .catch((err) => next(err))
+                Promise.all([orgTest.save(), test.save()])
+                    .then((result) => { res.send(test) })
+                    .catch((err) => next(err))
 
-                    }
-                    else {
-                        return res.status(400).json({
-                            err: "test with given name already exists"
-                        })
-                    }
-                }
-            })
+            }
+            else {
+                console.log("test with same name already exists")
+                return res.status(400).json({
+                    err: "test with given name already exists"
+                })
+            }
+            // }
+            // })
         })
         .catch(function (error) {
+
+            console.log("error in axios create test", error.toString())
             res.send(error);
         });
 
