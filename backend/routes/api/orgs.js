@@ -26,7 +26,8 @@ router.post('/register', (req, res) => {
                 email: req.body.email,
                 password: req.body.password,
                 vision: req.body.vision,
-                course: req.body.course
+                course: req.body.course,
+                introVideo: req.body.demoVideo
             });
             bcrypt.genSalt(10, (err, salt) => {
                 bcrypt.hash(newOrg.password, salt, (err, hash) => {

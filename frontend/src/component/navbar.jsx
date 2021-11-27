@@ -1,31 +1,40 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { Navbar, Container, NavbarBrand, Nav, UncontrolledCollapse, NavItem, Row, Col } from "reactstrap";
+import {
+  Navbar,
+  Container,
+  NavbarBrand,
+  Nav,
+  UncontrolledCollapse,
+  NavItem,
+  Row,
+  Col,
+} from "reactstrap";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { logout } from '../actions/authActions'
+import { logout } from "../actions/authActions";
 class Navbar1 extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loggedIn: false
-    }
+      loggedIn: false,
+    };
   }
-  onLogout = e => {
+  onLogout = (e) => {
     // e.preventDefault();
     this.props.logout();
     // this.props.history.push('/');
-  }
+  };
   loginCheck() {
-    const { user } = this.props.auth
+    const { user } = this.props.auth;
     if (user.teacherName || user.name) {
       this.setState({
-        loggedIn: true
-      })
+        loggedIn: true,
+      });
     }
   }
   componentDidMount() {
-    this.loginCheck()
+    this.loginCheck();
   }
   render() {
     return (
@@ -37,15 +46,16 @@ class Navbar1 extends Component {
             id="navbar-main"
           >
             <Container>
-              <NavbarBrand className="mr-lg-5">
-                <Link to='/'>
-                <img
-                  alt="..."
-                  className="img-fluid"
-                  src={require("./../assets/logo.svg")}
-                  style={{ height: "3em" }}
-                  /></Link>
-              </NavbarBrand>
+              <div className="mr-lg-5">
+                <Link to="/">
+                  <img
+                    alt="..."
+                    className="img-fluid"
+                    src={require("./../assets/logo.svg")}
+                    style={{ height: "3em" }}
+                  />
+                </Link>
+              </div>
               {this.state.loggedIn ? (
                 <>
                   <button className="navbar-toggler" id="navbar_global">
@@ -54,9 +64,7 @@ class Navbar1 extends Component {
                   <UncontrolledCollapse navbar toggler="#navbar_global">
                     <div className="navbar-collapse-header">
                       <Row>
-                        <Col className="collapse-brand" xs="6">
-
-                        </Col>
+                        <Col className="collapse-brand" xs="6"></Col>
                         <Col className="collapse-close" xs="6">
                           <button className="navbar-toggler" id="navbar_global">
                             <span />
@@ -67,16 +75,18 @@ class Navbar1 extends Component {
                     </div>
                     <Nav className="align-items-lg-center ml-lg-auto" navbar>
                       <NavItem>
-                        <Link to='/'><div>
-                          <span onClick={this.onLogout}>Logout</span>
-                        </div>
+                        <Link to="/">
+                          <div>
+                            <span onClick={this.onLogout}>Logout</span>
+                          </div>
                         </Link>
                       </NavItem>
                     </Nav>
                   </UncontrolledCollapse>
                 </>
-              ) : <></>}
-
+              ) : (
+                <></>
+              )}
             </Container>
           </Navbar>
         </header>
@@ -86,9 +96,9 @@ class Navbar1 extends Component {
 }
 Navbar1.propTypes = {
   auth: PropTypes.object.isRequired,
-  logout: PropTypes.func.isRequired
-}
-const mapStateToProps = state => ({
-  auth: state.auth
-})
+  logout: PropTypes.func.isRequired,
+};
+const mapStateToProps = (state) => ({
+  auth: state.auth,
+});
 export default connect(mapStateToProps, { logout })(Navbar1);

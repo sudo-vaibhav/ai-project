@@ -10,12 +10,12 @@ const userScoreSchema = new Schema({
 
 const orgTestsSchema = new Schema({
     testId: {
-        type:String,
-        required:true
+        type: String,
+        required: true
     },
     teacherId: {
-        type:String,
-        required:true
+        type: String,
+        required: true
     },
     usersScores: [userScoreSchema]
 })
@@ -33,18 +33,19 @@ const orgSchema = new Schema({
     },
     email: {
         type: String,
-        required:true
+        required: true
     },
     password: {
         type: String,
-        required:true
+        required: true
     },
-    testCreated:[String],
+    testCreated: [String],
     vision: String,
     course: String,
     demoVideo: String,
     videos: [materialSchema],
-    resources: [materialSchema]
+    resources: [materialSchema],
+    introVideo: String
 })
 
 
@@ -53,5 +54,5 @@ const userScore = Mongoose.model('userScore', userScoreSchema)
 const orgTests = Mongoose.model('orgTests', orgTestsSchema);
 
 module.exports = {
-    Org,userScore,orgTests
+    Org, userScore, orgTests
 }

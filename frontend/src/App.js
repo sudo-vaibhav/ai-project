@@ -13,14 +13,14 @@ import Result from './component/result.component';
 import { Provider } from 'react-redux';
 import store from './store'
 import SearchFacutly from './component/searchFacutly';
-function App() {  
+function App() {
   return (
     <>
       <Provider store={store}>
-      <BrowserRouter basename={process.env.PUBLIC_URL}>
-        <div>
-          <Switch>
-            <Route path="/" exact component={Hero} />
+        <BrowserRouter basename={process.env.PUBLIC_URL}>
+          <div>
+            <Switch>
+              <Route path="/" exact component={Hero} />
               <Route path="/login" exact component={Login} />
               <Route path="/loginTeacher" exact component={LoginTeacher} />
               <Route path="/register" exact component={Register} />
@@ -34,7 +34,7 @@ function App() {
             </Switch>
 
 
-        </div>
+          </div>
         </BrowserRouter>
       </Provider>
     </>

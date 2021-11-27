@@ -171,19 +171,6 @@ class Exam extends Component {
                 className="submit-area"
                 style={{ textAlign: "right", marginTop: "5em" }}
               >
-                {/* <Link to={{
-                  pathname: '/result',
-                  // query: {
-                  //   marks: this.state.sampleRes
-
-                  // }
-                }}>
-
-
-                <Button className="py-2" color="warning">
-                    Continue
-                </Button>
-                </Link> */}
                 <Button
                   className="my-4"
                   type="button"
@@ -223,9 +210,16 @@ class Exam extends Component {
                               totalMarks: QuizData.length,
                             },
                           });
+                          this.setState({
+                            loading: false,
+                          });
                         })
-                        .catch((err) => {
-                          console.log(err);
+                        .catch(({ response }) => {
+                          alert(response.data.err.toString());
+                          this.setState({
+                            loading: false,
+                          });
+                          console.log(response);
                         });
                     }}
                     disabled={loading}

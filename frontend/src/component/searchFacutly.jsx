@@ -55,11 +55,13 @@ class SearchFaculty extends Component {
         });
       });
   };
-  setTutor = (e) => {
+  setTutor = () => {
     const data = {
       myTutor: this.state.myTutor,
       testCreated: this.state.testCreated,
     };
+
+    console.log("setting tutor", this.state);
     this.props.setMyTutor(data);
   };
   componentDidMount() {
